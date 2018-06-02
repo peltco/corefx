@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -197,6 +197,22 @@ namespace System.Text.RegularExpressions
                 match = match.NextMatch();
                 Assert.False(match.Success);
             }
+        }
+
+        [Fact]
+        public static void ClassifySurrogates_Test()
+        {
+            var value = "𦕒";
+            var regexLetters = new Regex(@"^\p{Lo}$");
+
+            var regexSurrogates = new Regex(@"^\p{Cs}{2}$");
+
+            Assert.Equal(UnicodeCategory.OtherLetter, char.GetUnicodeCategory(value, 0));
+            Assert.Equal(UnicodeCategory.OtherLetter, CharUnicodeInfo.GetUnicodeCategory(value, 0));
+            Assert.True(regexSurrogates.IsMatch(value));
+
+            // Fails here
+            Assert.True(regexLetters.IsMatch(value));
         }
     }
 }
